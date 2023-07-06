@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
-import UpcomingBirthday from "./UpcomingBirthday";
 import "./Home.css";
-
-const Home = () => {
+const UpcomingBirthday = () => {
   return (
     <div>
       <ViewSavedData />
-      <UpcomingBirthday />
     </div>
   );
 };
@@ -30,15 +27,25 @@ const ViewSavedData = () => {
   }, []);
 
   const today = new Date();
-  const todayBirthdays = formDataList.filter(
-    (formData) => formData.birthday === formatDate(today)
-  );
+  today.setDate(today.getDate() + 1);
+  const oneWeekFromNow = new Date();
+  oneWeekFromNow.setDate(today.getDate() + 7);
+
+  const birthdaysSoon = formDataList.filter((formData) => {
+    const birthdayDate = new Date(formData.birthday);
+    return birthdayDate >= today && birthdayDate <= oneWeekFromNow;
+  });
+
+  const todayBirthdays = birthdaysSoon.filter((formData) => {
+    const birthdayDate = new Date(formData.birthday);
+    return formatDate(birthdayDate) === formatDate(today);
+  });
 
   return (
     <div className="container">
-      <h2>Today's Birthdays:</h2>
-      {todayBirthdays?.length > 0 ? (
-        todayBirthdays.map((formData, index) => (
+      <h2>Upcoming Birthdays:</h2>
+      {birthdaysSoon.length > 0 ? (
+        birthdaysSoon.map((formData, index) => (
           <div key={index} className="card">
             <p>Entry {index + 1}</p>
             <p>First Name: {formData.firstName}</p>
@@ -54,10 +61,10 @@ const ViewSavedData = () => {
           </div>
         ))
       ) : (
-        <p>No birthdays today.</p>
+        <p>No birthdays coming up in the next week.</p>
       )}
     </div>
   );
 };
 
-export default Home;
+export default UpcomingBirthday;
